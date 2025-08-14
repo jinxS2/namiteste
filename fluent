@@ -9,7 +9,7 @@
 
 A modified version of Fluent
 github.com/discoart/FluentPlus | dsc.gg/hydrahub
-
+Nami
 ]]
 
 --- button
@@ -6565,7 +6565,7 @@ function Library:CreateWindow(Config)
 	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
 	Library.UseAcrylic = Config.Acrylic or false
 	Library.Acrylic = Config.Acrylic or false
-	Library.Theme = Config.Theme or "Dark"
+	Library.Theme = Config.Theme or "Grape"
 	if Config.Acrylic then
 		Acrylic.init()
 	end
