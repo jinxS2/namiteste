@@ -1325,19 +1325,19 @@ function Creator.Disconnect()
 end
 
 Creator.Themes = Themes
-Creator.Theme = Creator.Theme or "Dark"
+Creator.Theme = Creator.Theme or "Grape"
 
 function Creator.GetThemeProperty(Property)
 	local Theme = Creator.Themes[Creator.Theme]
 	if Theme then
 		return Theme[Property]
 	end
-	return Creator.Themes.Dark[Property]
+	return Creator.Themes.Grape[Property]
 end
 
 function Creator.UpdateTheme()
 	if not Creator.Themes[Creator.Theme] then
-		Creator.Theme = "Dark"
+		Creator.Theme = "Grape"
 	end
 
 	for Instance, Object in next, Creator.Registry do
@@ -1379,7 +1379,7 @@ function Creator.GetThemeProperty(Property)
 	if Themes[Library.Theme][Property] then
 		return Themes[Library.Theme][Property]
 	end
-	return Themes["Dark"][Property]
+	return Themes["Grape"][Property]
 end
 
 function Creator.New(Name, Properties, Children)
