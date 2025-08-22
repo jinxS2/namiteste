@@ -9,7 +9,7 @@
 
 A modified version of Fluent
 github.com/discoart/FluentPlus | dsc.gg/hydrahub
-
+Nami
 ]]
 
 --- button
@@ -3830,6 +3830,9 @@ ElementsTable.Dropdown = (function()
 		})
 		table.insert(Library.OpenFrames, DropdownHolderCanvas)
 
+		-- Variável para controlar se deve ignorar cliques externos
+		local IgnoreOutsideClick = false
+
 		local function RecalculateListPosition()
 			local Add = -40
 			if Camera.ViewportSize.Y - DropdownInner.AbsolutePosition.Y < DropdownHolderCanvas.AbsoluteSize.Y - 5 then
@@ -3917,14 +3920,36 @@ ElementsTable.Dropdown = (function()
 			end
 		end)
 
+		-- CORREÇÃO: Sistema melhorado de detecção de clique externo
 		Creator.AddSignal(UserInputService.InputBegan, function(Input)
-			if
-				Input.UserInputType == Enum.UserInputType.MouseButton1
-				or Input.UserInputType == Enum.UserInputType.Touch
-			then
+			-- Ignora se a flag estiver ativa
+			if IgnoreOutsideClick then 
+				return 
+			end
+
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+				-- Não faz nada se o dropdown estiver fechado
+				if not Dropdown.Opened then
+					return
+				end
+
+				-- Verifica se o clique foi no próprio botão do dropdown
+				local ButtonAbsPos = DropdownInner.AbsolutePosition
+				local ButtonAbsSize = DropdownInner.AbsoluteSize
+				
+				local ClickedOnButton = Mouse.X >= ButtonAbsPos.X 
+					and Mouse.X <= ButtonAbsPos.X + ButtonAbsSize.X 
+					and Mouse.Y >= ButtonAbsPos.Y 
+					and Mouse.Y <= ButtonAbsPos.Y + ButtonAbsSize.Y
+					
+				-- Se clicou no botão, não fecha o dropdown
+				if ClickedOnButton then
+					return
+				end
+				
+				-- Verifica se clicou fora da área do dropdown
 				local AbsPos, AbsSize = DropdownHolderFrame.AbsolutePosition, DropdownHolderFrame.AbsoluteSize
-				if
-					Mouse.X < AbsPos.X
+				if Mouse.X < AbsPos.X
 					or Mouse.X > AbsPos.X + AbsSize.X
 					or Mouse.Y < (AbsPos.Y - 20 - 1)
 					or Mouse.Y > AbsPos.Y + AbsSize.Y
@@ -3936,6 +3961,9 @@ ElementsTable.Dropdown = (function()
 
 		local ScrollFrame = self.ScrollFrame
 		function Dropdown:Open()
+			-- Ativa a flag para ignorar cliques externos temporariamente
+			IgnoreOutsideClick = true
+			
 			Dropdown.Opened = true
 			DropdownDisplay.Interactable = Dropdown.Searchable and true or false
 			ScrollFrame.ScrollingEnabled = false
@@ -3953,6 +3981,12 @@ ElementsTable.Dropdown = (function()
 			if Dropdown.Searchable then
 				DropdownDisplay:CaptureFocus()
 			end
+			
+			-- Desativa a flag após um pequeno delay para permitir cliques externos novamente
+			spawn(function()
+				wait(0.1)
+				IgnoreOutsideClick = false
+			end)
 		end
 
 		function Dropdown:Close()
