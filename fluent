@@ -1911,21 +1911,29 @@ Components.Section = (function()
 	end
 end)()
 
--- Agora você também precisa modificar a função AddSection no Tab para aceitar o ícone.
--- Encontre a função Tab:AddSection e substitua por:
+-- ENCONTRE e SUBSTITUA a função Tab:AddSection no código Components.Tab
+-- Procure por esta linha no seu código: function Tab:AddSection(SectionTitle)
+-- E substitua toda a função por:
 
 function Tab:AddSection(SectionTitle, SectionIcon)
 	local Section = { Type = "Section" }
 
+	-- Processar o ícone (se fornecido)
 	local Icon = SectionIcon
-	if Library:GetIcon and Library:GetIcon(Icon) then
-		Icon = Library:GetIcon(Icon)
+	
+	-- Verificar se existe função GetIcon (some códigos têm, outros não)
+	if Library.GetIcon and type(Library.GetIcon) == "function" then
+		if Library:GetIcon(Icon) then
+			Icon = Library:GetIcon(Icon)
+		end
 	end
 
+	-- Se Icon está vazio ou nil, definir como nil
 	if Icon == "" or Icon == nil then
 		Icon = nil
 	end
 
+	-- Criar a seção com ícone
 	local SectionFrame = Components.Section(SectionTitle, Tab.Container, Icon)
 	Section.Container = SectionFrame.Container
 	Section.ScrollFrame = Tab.Container
