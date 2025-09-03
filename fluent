@@ -1832,10 +1832,11 @@ Components.Element = (function()
 		return Element
 	end
 end)()
+
 Components.Section = (function()
 	local New = Creator.New
 
-	return function(Title, Parent)
+	return function(Title, Parent, Icon)
 		local Section = {}
 
 		Section.Layout = New("UIListLayout", {
@@ -1850,12 +1851,29 @@ Components.Section = (function()
 			Section.Layout,
 		})
 
-		Section.Root = New("Frame", {
+		-- Criar o header da seção com layout horizontal para ícone + texto
+		local SectionHeader = New("Frame", {
+			Size = UDim2.new(1, -16, 0, 18),
+			Position = UDim2.fromOffset(0, 2),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 26),
-			LayoutOrder = 7,
-			Parent = Parent,
 		}, {
+			New("UIListLayout", {
+				Padding = UDim.new(0, 5),
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+			}),
+			-- Ícone (só aparece se Icon for fornecido)
+			Icon and New("ImageLabel", {
+				Image = Icon,
+				Size = UDim2.fromOffset(16, 16),
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				ThemeTag = {
+					ImageColor3 = "Text",
+				},
+			}) or nil,
+			-- Texto da seção
 			New("TextLabel", {
 				RichText = true,
 				Text = Title,
@@ -1864,12 +1882,23 @@ Components.Section = (function()
 				TextSize = 18,
 				TextXAlignment = "Left",
 				TextYAlignment = "Center",
-				Size = UDim2.new(1, -16, 0, 18),
-				Position = UDim2.fromOffset(0, 2),
+				Size = UDim2.fromScale(0, 1),
+				AutomaticSize = Enum.AutomaticSize.X,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
 				ThemeTag = {
 					TextColor3 = "Text",
 				},
 			}),
+		})
+
+		Section.Root = New("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 26),
+			LayoutOrder = 7,
+			Parent = Parent,
+		}, {
+			SectionHeader,
 			Section.Container,
 		})
 
@@ -1877,9 +1906,33 @@ Components.Section = (function()
 			Section.Container.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y)
 			Section.Root.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y + 25)
 		end)
+		
 		return Section
 	end
 end)()
+
+-- Agora você também precisa modificar a função AddSection no Tab para aceitar o ícone.
+-- Encontre a função Tab:AddSection e substitua por:
+
+function Tab:AddSection(SectionTitle, SectionIcon)
+	local Section = { Type = "Section" }
+
+	local Icon = SectionIcon
+	if Library:GetIcon and Library:GetIcon(Icon) then
+		Icon = Library:GetIcon(Icon)
+	end
+
+	if Icon == "" or Icon == nil then
+		Icon = nil
+	end
+
+	local SectionFrame = Components.Section(SectionTitle, Tab.Container, Icon)
+	Section.Container = SectionFrame.Container
+	Section.ScrollFrame = Tab.Container
+
+	setmetatable(Section, Elements)
+	return Section
+end
 Components.Tab = (function()
 	local New = Creator.New
 	local Spring = Flipper.Spring.new
