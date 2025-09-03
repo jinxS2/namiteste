@@ -2,7 +2,7 @@
 --[[             |
  FluentPlus 1.2  |
 dsc.gg/hydrahub  |
-]]--             |
+]]--          a   |
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -12,7 +12,7 @@ local TextService = game:GetService("TextService")
 local Camera = game:GetService("Workspace").CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 local httpService = game:GetService("HttpService")
-local Mobile = false
+
 
 local RenderStepped = RunService.RenderStepped
 
@@ -1836,7 +1836,7 @@ end)()
 Components.Section = (function()
 	local New = Creator.New
 
-	return function(Title, Parent, Icon)
+	return function(Title, Parent)
 		local Section = {}
 
 		Section.Layout = New("UIListLayout", {
@@ -1851,29 +1851,12 @@ Components.Section = (function()
 			Section.Layout,
 		})
 
-		-- Criar o header da seção com layout horizontal para ícone + texto
-		local SectionHeader = New("Frame", {
-			Size = UDim2.new(1, -16, 0, 18),
-			Position = UDim2.fromOffset(0, 2),
+		Section.Root = New("Frame", {
 			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 26),
+			LayoutOrder = 7,
+			Parent = Parent,
 		}, {
-			New("UIListLayout", {
-				Padding = UDim.new(0, 5),
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-			}),
-			-- Ícone (só aparece se Icon for fornecido)
-			Icon and New("ImageLabel", {
-				Image = Icon,
-				Size = UDim2.fromOffset(16, 16),
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				ThemeTag = {
-					ImageColor3 = "Text",
-				},
-			}) or nil,
-			-- Texto da seção
 			New("TextLabel", {
 				RichText = true,
 				Text = Title,
@@ -1882,23 +1865,12 @@ Components.Section = (function()
 				TextSize = 18,
 				TextXAlignment = "Left",
 				TextYAlignment = "Center",
-				Size = UDim2.fromScale(0, 1),
-				AutomaticSize = Enum.AutomaticSize.X,
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
+				Size = UDim2.new(1, -16, 0, 18),
+				Position = UDim2.fromOffset(0, 2),
 				ThemeTag = {
 					TextColor3 = "Text",
 				},
 			}),
-		})
-
-		Section.Root = New("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 26),
-			LayoutOrder = 7,
-			Parent = Parent,
-		}, {
-			SectionHeader,
 			Section.Container,
 		})
 
@@ -1906,41 +1878,9 @@ Components.Section = (function()
 			Section.Container.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y)
 			Section.Root.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y + 25)
 		end)
-		
 		return Section
 	end
 end)()
-
--- ENCONTRE e SUBSTITUA a função Tab:AddSection no código Components.Tab
--- Procure por esta linha no seu código: function Tab:AddSection(SectionTitle)
--- E substitua toda a função por:
-
-function Tab:AddSection(SectionTitle, SectionIcon)
-	local Section = { Type = "Section" }
-
-	-- Processar o ícone (se fornecido)
-	local Icon = SectionIcon
-	
-	-- Verificar se existe função GetIcon (some códigos têm, outros não)
-	if Library.GetIcon and type(Library.GetIcon) == "function" then
-		if Library:GetIcon(Icon) then
-			Icon = Library:GetIcon(Icon)
-		end
-	end
-
-	-- Se Icon está vazio ou nil, definir como nil
-	if Icon == "" or Icon == nil then
-		Icon = nil
-	end
-
-	-- Criar a seção com ícone
-	local SectionFrame = Components.Section(SectionTitle, Tab.Container, Icon)
-	Section.Container = SectionFrame.Container
-	Section.ScrollFrame = Tab.Container
-
-	setmetatable(Section, Elements)
-	return Section
-end
 Components.Tab = (function()
 	local New = Creator.New
 	local Spring = Flipper.Spring.new
@@ -6303,52 +6243,6 @@ local MinimizeButton = New("TextButton", {
 		})
 	})
 })
-
-
-local Minimizer
-if Mobile then
-	Minimizer = New("Frame", {
-		Parent = GUI,
-		Size = UDim2.new(0, 32, 0, 32),
-		Position = UDim2.new(0.45, 0, 0.025, 0),
-		BackgroundTransparency = 1,
-		ZIndex = 999999999,
-	},
-	{
-		New("Frame", {
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = 0.5,
-			BorderSizePixel = 0
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0.25, 0),
-			}),
-			MinimizeButton
-		})
-	})
-else
-	Minimizer = New("Frame", {
-		Parent = GUI,
-		Size = UDim2.new(0, 32, 0, 32),
-		Position = UDim2.new(0.45, 0, 0.025, 0),
-		BackgroundTransparency = 1,
-		ZIndex = 999999999,
-	},
-	{
-		New("Frame", {
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			Size = UDim2.new(0, 0, 0, 0),
-			BackgroundTransparency = 0,
-			BorderSizePixel = 0
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0.25, 0),
-			}),
-			MinimizeButton
-		})
-	})
-end
 
 Creator.AddSignal(Minimizer.InputBegan, function(Input)
 	if
