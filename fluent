@@ -34,6 +34,7 @@ local Themes = {
 		"Sunset", 
 		"Ocean",
 		"Emerald",
+		"Grape",
 		"Sapphire"
 	},
 	Dark = {
@@ -72,6 +73,44 @@ local Themes = {
 		SubText = Color3.fromRGB(170, 170, 170),
 		Hover = Color3.fromRGB(120, 120, 120),
 		HoverChange = 0.07,
+	},
+    Grape = {
+		Name = "Grape",
+		Accent = Color3.fromRGB(183, 176, 223),
+		AcrylicMain = Color3.fromRGB(0, 0, 0),
+		AcrylicBorder = Color3.fromRGB(20, 20, 20),
+		AcrylicGradient = ColorSequence.new(Color3.fromRGB(6, 0, 16), Color3.fromRGB(6, 0, 16)),
+		AcrylicNoise = 1,
+		TitleBarLine = Color3.fromRGB(25, 25, 25),
+		Tab = Color3.fromRGB(40, 40, 40),
+		Element = Color3.fromRGB(15, 15, 15),
+		ElementBorder = Color3.fromRGB(6, 0, 16),
+		InElementBorder = Color3.fromRGB(40, 40, 40),
+		ElementTransparency = 1,
+		ToggleSlider = Color3.fromRGB(255, 255, 255),
+		ToggleToggled = Color3.fromRGB(19, 16, 36),
+		SliderRail = Color3.fromRGB(40, 40, 40),
+		DropdownFrame = Color3.fromRGB(20, 20, 20),
+		DropdownHolder = Color3.fromRGB(12, 0, 34),
+		DropdownBorder = Color3.fromRGB(6, 0, 16),
+		DropdownOption = Color3.fromRGB(40, 40, 40),
+		Keybind = Color3.fromRGB(40, 40, 40),
+		Input = Color3.fromRGB(40, 40, 40),
+		InputFocused = Color3.fromRGB(6, 0, 16),
+		InputIndicator = Color3.fromRGB(60, 60, 60),
+		InputIndicatorFocus = Color3.fromRGB(255, 255, 255),
+		Dialog = Color3.fromRGB(7, 0, 18),
+		DialogHolder = Color3.fromRGB(7, 0, 18),
+		DialogHolderLine = Color3.fromRGB(7, 0, 18),
+		DialogButton = Color3.fromRGB(13, 0, 33),
+		DialogButtonBorder = Color3.fromRGB(30, 30, 30),
+		DialogBorder = Color3.fromRGB(27, 27, 27),
+		DialogInput = Color3.fromRGB(7, 0, 18),
+		DialogInputLine = Color3.fromRGB(60, 60, 60),
+		Text = Color3.fromRGB(255, 255, 255),
+		SubText = Color3.fromRGB(123, 144, 170),
+		Hover = Color3.fromRGB(40, 40, 40),
+		HoverChange = 0.04
 	},
 	Darker = {
 		Name = "Darker",
@@ -1989,29 +2028,20 @@ Components.Tab = (function()
 		Tab.Container = Tab.ContainerFrame
 		Tab.ScrollFrame = Tab.Container
 
-    function Tab:AddSection(SectionTitle, Icon)
-        local Section = { Type = "Section" }
+		function Tab:AddSection(SectionTitle)
+			local Section = { Type = "Section" }
 
-        -- Cria a seção normalmente
-        local SectionFrame = Components.Section(SectionTitle, Tab.Container)
-        Section.Container = SectionFrame.Container
-        Section.ScrollFrame = Tab.Container
+			local SectionFrame = Components.Section(SectionTitle, Tab.Container)
+			Section.Container = SectionFrame.Container
+			Section.ScrollFrame = Tab.Container
 
-        -- Se tiver ícone, adiciona um ImageLabel
-        if Icon then
-            local Image = Instance.new("ImageLabel")
-            Image.Name = "SectionIcon"
-            Image.Image = Icon
-            Image.Size = UDim2.new(0, 20, 0, 20)
-            Image.Position = UDim2.new(0, -25, 0, 0)
-            Image.BackgroundTransparency = 1
-            Image.Parent = SectionFrame.Container
-        end
+			setmetatable(Section, Elements)
+			return Section
+		end
 
-        setmetatable(Section, Elements)
-        return Section
-    end
-
+		setmetatable(Tab, Elements)
+		return Tab
+	end
 
 	function TabModule:SelectTab(Tab)
 		local Window = TabModule.Window
@@ -6190,7 +6220,6 @@ if getgenv then
 else
 	Fluent = Library
 end
-
 local MinimizeButton = New("TextButton", {
 	BackgroundTransparency = 1,
 	Size = UDim2.new(1, 0, 1, 0),
@@ -6202,9 +6231,17 @@ local MinimizeButton = New("TextButton", {
 		PaddingRight = UDim.new(0, 2),
 		PaddingTop = UDim.new(0, 2),
 	}),
-    -- removido o ImageLabel que usava Mobile
+	New("ImageLabel", {
+		Image = Mobile and "rbxassetid://10734897102" or "",
+		Size = UDim2.new(4, 0, 4, 0),
+		BackgroundTransparency = 1,
+	}, {
+		New("UIAspectRatioConstraint", {
+			AspectRatio = 1,
+			AspectType = Enum.AspectType.FitWithinMaxSize,
+		})
+	})
 })
-
 
 
 local Minimizer
